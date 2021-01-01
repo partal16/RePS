@@ -11,6 +11,9 @@ class Database:
         self.problems[self._last_problem_key] = problem
         return self._last_problem_key
 
+    def update_problem(self, problem_key, problem):
+        self.problems[problem_key] = problem
+
     def delete_problem(self, problem_key):
         if problem_key in self.problems:
             del self.problems[problem_key]

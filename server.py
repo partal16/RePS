@@ -9,12 +9,21 @@ def create_app():
     app.config.from_object("settings")
 
     app.add_url_rule("/", view_func=views.home_page)
-    app.add_url_rule("/problems", view_func=views.problems_page)
+    app.add_url_rule("/problems", view_func=views.problems_page, methods=["GET", "POST"])
     app.add_url_rule("/problems/<int:problem_key>", view_func=views.problem_page)
+    app.add_url_rule("/problems/<int:problem_key>/delete",
+                     view_func=views.problem_delete,
+                     methods=["GET", "POST"],)
+    app.add_url_rule("/problems/<int:problem_key>/edit",
+                     view_func=views.problem_edit_page,
+                     methods=["GET", "POST"],)
+    app.add_url_rule("/problems/<int:problem_key>/editn",
+                     view_func=views.problem_edit_page,
+                     methods=["GET", "POST"],)
+
+    app.add_url_rule("/new-problem", view_func=views.problem_add_page, methods=["GET", "POST"])
 
     db = Database()
-    db.add_problem(Problem("Kirik Cam", "Med de 2. katta çam kırık"))
-    db.add_problem(Problem("Bozuk Projeksiyon", "Ehb 3004'te projeksiyon arizali"))
     app.config["db"] = db
 
     return app
