@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Problem{% endblock %}
+{% block content %}
+	<h1 class="title" >Problem</h1>
+
+	<div class="box" >
+		<article class="media" >
+			<div class="media-content" >
+				<div class="content" >
+					<p>
+						<strong>{{ problem.title }}</strong>
+						<br>
+						<br>
+						{{ problem.description }}
+						<br>
+						<br>
+						Seen number: {{ problem.n_seen }}
+					</p>
+				</div>
+			</div>
+		</article>
+	</div>
+{% endblock %}
+		

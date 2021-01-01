@@ -1,0 +1,6 @@
+class AuthorizedPerson:
+    def __init__(self, email, f_name, l_name, passw):
+        self.email = email
+        self.f_name = f_name
+        self.l_name = l_name
+        self.passw = passw
