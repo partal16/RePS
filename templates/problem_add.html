@@ -29,6 +29,18 @@
 				</p>
 			{% endfor %}
 		</div>
+
+		<div class="field" >
+			<label for="build" class="label" >Build</label>
+			<div class="control" >
+				{{ form.build(required=True, autofocus=True, class="input") }}
+			</div>
+			{% for error in form.build.errors%}
+				<p class="help has-background-warning">
+					{{ error }}
+				</p>
+			{% endfor %}
+		</div>
 		
 		<div class="field is-grouped" >
 			<div class="control" >
@@ -40,4 +52,4 @@
 			</div>
 		</div>
 	</form>
-{% endblock %}
+	{% endblock %}

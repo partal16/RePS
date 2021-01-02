@@ -17,9 +17,6 @@ def create_app():
     app.add_url_rule("/problems/<int:problem_key>/edit",
                      view_func=views.problem_edit_page,
                      methods=["GET", "POST"],)
-    app.add_url_rule("/problems/<int:problem_key>/editn",
-                     view_func=views.problem_edit_page,
-                     methods=["GET", "POST"],)
 
     app.add_url_rule("/new-problem", view_func=views.problem_add_page, methods=["GET", "POST"])
 
