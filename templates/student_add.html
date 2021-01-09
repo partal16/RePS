@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block title %}SigUp Student{% endblock %}
+{% block content %}
+	<form action="" method="post" name="student_add" >
+		{{ form.csrf_token }}
+		<div class="field" >
+			<label for="first_name" class="label" >First Name</label>
+			<div class="control" >
+				{{ form.first_name(required=True, autofocus=True, class="input") }}
+			</div>
+			{% for error in form.first_name.errors %}
+				<p class="help has-background-warning">
+					{{ error }}
+				</p>
+			{% endfor %}
+		</div>
+
+		<div class="field" >
+			<label for="last_name" class="label" >Last Name</label>
+			<div class="control" >
+				{{ form.last_name(required=True, autofocus=True, class="input") }}
+			</div>
+			{% for error in form.last_name.errors %}
+				<p class="help has-background-warning">
+					{{ error }}
+				</p>
+			{% endfor %}
+		</div>
+
+		<div class="field" >
+			<label for="email" class="label" >Email</label>
+			<div class="control" >
+				{{ form.email(required=True, autofocus=True, class="input") }}
+			</div>
+			{% for error in form.email.errors%}
+				<p class="help has-background-warning">
+					{{ error }}
+				</p>
+			{% endfor %}
+		</div>
+
+		<div class="field" >
+			<label for="password" class="label" >Password</label>
+			<div class="control" >
+				{{ form.password(required=True, autofocus=True,
+					class="input") }}
+			</div>
+			{% for error in form.password.errors%}
+				<p class="help has-background-warning">
+					{{ error }}
+				</p>
+			{% endfor %}
+		</div>
+		
+		<div class="field is-grouped" >
+			<div class="control" >
+				<button class="button is-link">Sign Up</a>
+			</div>
+		</div>
+
+	</form>
+{% endblock %}

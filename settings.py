@@ -1,4 +1,4 @@
 DEBUG = True
 PORT = 8080
-SECRET_KEY = "secret"
+SECRET_KEY = "dev"
 WTF_CSRF_ENABLED = True

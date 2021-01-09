@@ -1,7 +1,6 @@
 class Student:
-    def __init__(self, email, s_id, first_name, last_name, passw):
+    def __init__(self, email, first_name, last_name, password):
         self.email = email
-        self.s_id = s_id
         self.first_name = first_name
         self.last_name = last_name
-        self.passw = passw
+        self.password = password

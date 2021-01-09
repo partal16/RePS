@@ -9,7 +9,9 @@ def create_app():
     app.config.from_object("settings")
 
     app.add_url_rule("/", view_func=views.home_page)
-    app.add_url_rule("/problems", view_func=views.problems_page, methods=["GET", "POST"])
+    app.add_url_rule("/problems", view_func=views.problems_page, methods=["GET", "POST"],)
+    app.add_url_rule("/signup", view_func=views.sign_up_page, methods=["GET", "POST"],)
+    app.add_url_rule("/login", view_func=views.login_page, methods=["GET", "POST"],)
     app.add_url_rule("/problems/<int:problem_key>", view_func=views.problem_page)
     app.add_url_rule("/problems/<int:problem_key>/delete",
                      view_func=views.problem_delete,
@@ -19,8 +21,12 @@ def create_app():
                      methods=["GET", "POST"],)
 
     app.add_url_rule("/new-problem", view_func=views.problem_add_page, methods=["GET", "POST"])
+    app.add_url_rule("/new-student", view_func=views.student_add_page, methods=["GET", "POST"],)
+    app.add_url_rule("/new-authorized", view_func=views.authorized_add_page,
+                     methods=["GET", "POST"],)
 
-    db = Database()
+
+    db = Database('database.ini')
     app.config["db"] = db
 
     return app

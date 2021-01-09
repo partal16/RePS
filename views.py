@@ -1,13 +1,93 @@
 from datetime import datetime
 from problem import Problem
-from forms import ProblemAddForm, ProblemEditForm
-from flask import abort, current_app, redirect,render_template, request, url_for
+from student import Student
+from authorized_person import AuthorizedPerson
+from build import Build
+from forms import ProblemAddForm, ProblemEditForm, StudentAddForm
+from flask import abort, current_app, redirect,render_template, request, url_for, flash
+from passlib.hash import pbkdf2_sha256 as hasher
 
 
 def home_page():
     today = datetime.today()
     day_name = today.strftime("%A")
     return render_template("home.html", day=day_name)
+
+def sign_up_page():
+    return render_template("sign_up.html")
+"""
+def signup_student_page():
+    form = StudentAddForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        f_name = request.form["first_name"]
+        l_name = request.form["last_name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        hashed = hasher.hash(password)
+        student = Student(email, f_name, l_name, hashed)
+        db = current_app.config["db"]
+        db.add_student(student)
+        return render_template("sign_up.html")
+    return render_template("student_add.html", form=form)
+"""
+
+def student_add_page():
+    if request.method == "GET":
+        values = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        return render_template("student_edit.html", values=values)
+    else:
+        f_n = request.form["first_name"]
+        l_n = request.form["last_name"]
+        e = request.form["email"]
+        p = request.form["password"]
+
+        error = None
+        db = current_app.config["db"]
+        if db.get_student(e, p) is not None:
+            error = "Email {} is already registered.".format(str(e))
+
+        print(error)
+        if error is None:
+            student = Student(e, f_n, l_n, p)
+            db.add_student(student)
+            return redirect(url_for("login_page"))
+
+        flash(error)
+        
+        values = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        return render_template("student_edit.html", values=values)
+
+    
+def authorized_add_page():
+    if request.method == "GET":
+        values = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        return render_template("authorized_edit.html", values=values)
+    else:
+        f_n = request.form["first_name"]
+        l_n = request.form["last_name"]
+        e = request.form["email"]
+        p = request.form["password"]        
+        authorized = AuthorizedPerson(e, l_n, f_n, p)
+        db = current_app.config["db"]
+        db.add_authorized(authorized)
+        return redirect(url_for("login_page"))
+
+def login_page():
+    s_id = None
+    if request.method == "GET":
+        values = {"email": "", "password": ""}
+        return render_template("login.html", values=values)
+    else:
+        email = request.form["email"]
+        password = request.form["password"]
+        db = current_app.config["db"]
+        s_id = db.get_student(email, password)
+        if s_id != None:
+            return redirect(url_for("home_page"))
+        else:
+            values = {"email": "", "password": ""}
+            return render_template("login.html", values=values)
 
 
 def problems_page():
@@ -43,8 +123,9 @@ def problem_add_page():
         form_description = request.form["description"]
         form_build = request.form["build"]
         problem = Problem(form_title, form_description)
+        build = Build(form_build)
         db = current_app.config["db"]
-        problem_key = db.add_problem(problem)
+        problem_key = db.add_problem(problem, build)
         return redirect(url_for("problem_page", problem_key=problem_key))
     return render_template("problem_add.html", form=form)
 

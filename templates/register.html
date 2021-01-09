@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}Register Student{% endblock %}
+{% block content %}
+	<form action="" method="post">
+		<label for="first_name">First Name</label>
+		<input name="first_name" id="first_name" required>
+		<label for="last_name">Last Name</label>
+		<input name="last_name" id="first_name" required>
+		<label for="email">Email</label>
+		<input name="email" id="email" required>
+		<label for="password">Password</label>
+		<input type="password" name="password" id="password" required>
+		<div class="control" >
+			<button class="button is-link" >Save</button>
+		</div>
+	</form>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half">
+			<div class="field is-grouped" >
+				<div class="control" >
+					<a class="button is-primary" href="{{ url_for('student_add_page') }}">
+						Student</a>
+				</div>
+				<div class="control" >
+					<a class="button is-link" href="{{ url_for('authorized_add_page') }}" >
+						Authorized Person</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
