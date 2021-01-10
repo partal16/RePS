@@ -40,12 +40,14 @@
 					<div class="navbar-end">
 						<div class="navbar-item">
 							<div class="buttons">
-								<a class="button is-primary" href="{{ url_for('sign_up_page') }}">
-									<strong>Sign up</strong>
-								</a>
-								<a class="button is-light" href="{{ url_for('login_page') }}">
-									Log in
-								</a>
+								{% if not current_user.email %}
+									<a class="button is-primary" href="{{ url_for('sign_up_page') }}">
+										<strong>Sign up</strong>
+									</a>
+									<a class="button is-light" href="{{ url_for('login_page') }}">
+										Log in
+									</a>
+								{% endif %}
 								{% if current_user.email %}
 									<a class="button is-light" href="{{ url_for('logout_page') }}">
 										Log out
@@ -60,10 +62,17 @@
 		</header>
 
 		<main>
-			{% for message in get_flashed_messages() %}
-				<div class="notification is-info" >{{ message }}</div>
-			{% endfor %}
-			
+			<br>
+			<div class="columns is-desktop is-centered">
+				<div class="column is-half" >
+					{% for message in get_flashed_messages() %}
+						<div class="notification is-info" >
+							<button class="delete" ></button>
+							{{ message }}
+						</div>
+					{% endfor %}
+				</div>
+			</div>
 			<section class="section" >
 				<div class="content"
 					 {% block content %}{% endblock %}

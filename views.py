@@ -18,6 +18,7 @@ def home_page():
     day_name = today.strftime("%A")
     return render_template("home.html", day=day_name)
 
+
 def sign_up_page():
     return render_template("sign_up.html")
 
@@ -37,8 +38,8 @@ def student_add_page():
         if db.get_student(e) is not None:
             error = "Email {} is already registered.".format(str(e))
 
-        print(error)
         if error is None:
+            p = hasher.hash(p)
             student = Student(e, f_n, l_n, p)
             db.add_student(student)
             return redirect(url_for("login_page"))
@@ -57,10 +58,21 @@ def authorized_add_page():
         f_n = request.form["first_name"]
         l_n = request.form["last_name"]
         e = request.form["email"]
-        p = request.form["password"]        
-        authorized = AuthorizedPerson(e, f_n, l_n, p)
+        p = request.form["password"]
+
+        error = None
         db = current_app.config["db"]
-        db.add_authorized(authorized)
+        if db.get_authorized(e) is not None:
+            error = "Email {} is already registered.".format(str(e))
+
+        if error is None:
+            p = hasher.hash(p)
+            authorized = AuthorizedPerson(e, f_n, l_n, p)
+            db.add_authorized(authorized)
+            return redirect(url_for("login_page"))
+
+        flash(error)
+        value = {"first_name": "", "last_name": "", "email": "", "password": ""}
         return redirect(url_for("login_page"))
 
 
@@ -74,13 +86,16 @@ def login_page():
         password = request.form["password"]
         user = get_user(email)
         if user is not None:
-            login_user(user)
-            flash("You have logged in.")
-            return redirect(url_for("home_page"))
+            if hasher.verify(password, user.password):
+                login_user(user)
+                return redirect(url_for("home_page"))
+            else:
+                flash("Incorrect password")
         else:
-            flash("Invalid credentials.")
-            values = {"email": "", "password": ""}
-            return render_template("login.html", values=values)
+            flash("Incorrect email.")
+
+        values = {"email": "", "password": ""}
+        return render_template("login.html", values=values)
 
 
 def logout_page():
@@ -113,6 +128,7 @@ def problem_page(problem_key):
     if problem is None:
         abort(404)
     return render_template("problem.html", problem=problem)
+
 
 def problem_add_page():
     form = ProblemAddForm()
