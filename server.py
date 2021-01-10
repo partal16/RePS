@@ -1,8 +1,16 @@
 from flask import Flask
+from flask_login import LoginManager
 
 import views
 from database import Database
 from problem import Problem
+from user import get_user
+
+lm = LoginManager()
+
+@lm.user_loader
+def load_user(user_id):
+    return get_user(user_id)
 
 def create_app():
     app = Flask(__name__)
@@ -12,6 +20,7 @@ def create_app():
     app.add_url_rule("/problems", view_func=views.problems_page, methods=["GET", "POST"],)
     app.add_url_rule("/signup", view_func=views.sign_up_page, methods=["GET", "POST"],)
     app.add_url_rule("/login", view_func=views.login_page, methods=["GET", "POST"],)
+    app.add_url_rule("/logout", view_func=views.logout_page)
     app.add_url_rule("/problems/<int:problem_key>", view_func=views.problem_page)
     app.add_url_rule("/problems/<int:problem_key>/delete",
                      view_func=views.problem_delete,
@@ -25,9 +34,12 @@ def create_app():
     app.add_url_rule("/new-authorized", view_func=views.authorized_add_page,
                      methods=["GET", "POST"],)
 
-
+    lm.init_app(app)
+    lm.login_view = "login_page"
+    
     db = Database('database.ini')
     app.config["db"] = db
+
 
     return app
 

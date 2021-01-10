@@ -30,10 +30,11 @@
 						<a class="navbar-item" href="{{ url_for('problems_page') }}">
 							Problems
 						</a>
-
-						<a class="navbar-item" href="{{ url_for('problem_add_page') }}">
-							Add problem
-						</a>
+						{% if current_user.is_student %} 
+							<a class="navbar-item" href="{{ url_for('problem_add_page') }}">
+								Add problem
+							</a>
+						{% endif %}
 					</div>
 
 					<div class="navbar-end">
@@ -45,6 +46,12 @@
 								<a class="button is-light" href="{{ url_for('login_page') }}">
 									Log in
 								</a>
+								{% if current_user.email %}
+									<a class="button is-light" href="{{ url_for('logout_page') }}">
+										Log out
+									</a>
+								{% endif %}
+
 							</div>
 						</div>
 					</div>
@@ -53,6 +60,10 @@
 		</header>
 
 		<main>
+			{% for message in get_flashed_messages() %}
+				<div class="notification is-info" >{{ message }}</div>
+			{% endfor %}
+			
 			<section class="section" >
 				<div class="content"
 					 {% block content %}{% endblock %}

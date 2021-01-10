@@ -3,9 +3,14 @@ from problem import Problem
 from student import Student
 from authorized_person import AuthorizedPerson
 from build import Build
+
 from forms import ProblemAddForm, ProblemEditForm, StudentAddForm
-from flask import abort, current_app, redirect,render_template, request, url_for, flash
+from flask import (
+    abort, current_app, redirect, render_template, request, url_for, flash
+)
 from passlib.hash import pbkdf2_sha256 as hasher
+from user import get_user
+from flask_login import login_user, logout_user, current_user
 
 
 def home_page():
@@ -15,22 +20,7 @@ def home_page():
 
 def sign_up_page():
     return render_template("sign_up.html")
-"""
-def signup_student_page():
-    form = StudentAddForm()
-    print(form.validate_on_submit())
-    if form.validate_on_submit():
-        f_name = request.form["first_name"]
-        l_name = request.form["last_name"]
-        email = request.form["email"]
-        password = request.form["password"]
-        hashed = hasher.hash(password)
-        student = Student(email, f_name, l_name, hashed)
-        db = current_app.config["db"]
-        db.add_student(student)
-        return render_template("sign_up.html")
-    return render_template("student_add.html", form=form)
-"""
+
 
 def student_add_page():
     if request.method == "GET":
@@ -44,7 +34,7 @@ def student_add_page():
 
         error = None
         db = current_app.config["db"]
-        if db.get_student(e, p) is not None:
+        if db.get_student(e) is not None:
             error = "Email {} is already registered.".format(str(e))
 
         print(error)
@@ -68,10 +58,11 @@ def authorized_add_page():
         l_n = request.form["last_name"]
         e = request.form["email"]
         p = request.form["password"]        
-        authorized = AuthorizedPerson(e, l_n, f_n, p)
+        authorized = AuthorizedPerson(e, f_n, l_n, p)
         db = current_app.config["db"]
         db.add_authorized(authorized)
         return redirect(url_for("login_page"))
+
 
 def login_page():
     s_id = None
@@ -81,13 +72,21 @@ def login_page():
     else:
         email = request.form["email"]
         password = request.form["password"]
-        db = current_app.config["db"]
-        s_id = db.get_student(email, password)
-        if s_id != None:
+        user = get_user(email)
+        if user is not None:
+            login_user(user)
+            flash("You have logged in.")
             return redirect(url_for("home_page"))
         else:
+            flash("Invalid credentials.")
             values = {"email": "", "password": ""}
             return render_template("login.html", values=values)
+
+
+def logout_page():
+    logout_user()
+    flash("You have logged out.")
+    return redirect(url_for("home_page"))
 
 
 def problems_page():
@@ -114,7 +113,6 @@ def problem_page(problem_key):
     if problem is None:
         abort(404)
     return render_template("problem.html", problem=problem)
-
 
 def problem_add_page():
     form = ProblemAddForm()

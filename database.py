@@ -165,16 +165,16 @@ class Database:
             if conn is not None:
                 conn.close()
 
-    def get_student(self, student_email, password):
-        sql = """SELECT student_id FROM student WHERE email = %s AND password = %s;"""
+    def get_student(self, student_email):
+        sql = """SELECT student_id, email, password FROM student WHERE email = %s;"""
         conn = None
         s_id = None
         try:
             params = self.config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            cur.execute(sql, (student_email, password))
-            s_id = cur.fetchone()[0]
+            cur.execute(sql, (student_email,))
+            s_id = cur.fetchone()
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -210,4 +210,25 @@ class Database:
         finally:
             if conn is not None:
                 conn.close()
-    
+
+    def get_authorized(self, auth_email):
+        sql = """SELECT id_number, email, password FROM authorized_person 
+                 WHERE email = %s;"""
+        conn = None
+        a_id = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (auth_email, ))
+            a_id = cur.fetchone()
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return a_id
+
