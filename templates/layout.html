@@ -30,11 +30,25 @@
 						<a class="navbar-item" href="{{ url_for('problems_page') }}">
 							Problems
 						</a>
+						
+						{% if current_user.email %}
+							<a class="navbar-item" href="{{ url_for('my_problems_page') }}">
+								My Problems
+							</a>
+						{% endif %}
+							
 						{% if current_user.is_student %} 
 							<a class="navbar-item" href="{{ url_for('problem_add_page') }}">
 								Add problem
 							</a>
 						{% endif %}
+
+						{% if current_user.email and not current_user.is_student %}
+							<a class="navbar-item" href="{{ url_for('problem_select_page') }}">
+								Select problem
+							</a>
+						{% endif %}
+						
 					</div>
 
 					<div class="navbar-end">

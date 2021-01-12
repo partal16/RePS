@@ -1,31 +1,41 @@
 {% extends "layout.html" %}
 {% block title %}Problem{% endblock %}
 {% block content %}
-	<h1 class="title" >Problem</h1>
-
-	<div class="box" >
-		<article class="media" >
-			<div class="media-content" >
-				<div class="content" >
-					<p>
-						<strong>{{ problem.title }}</strong>
-						<br>
-						<br>
-						{{ problem.description }}
-						<br>
-						<br>
-						Seen number: {{ problem.n_seen }}
-					</p>
-				</div>
-			</div>
-		</article>
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half" >
+			<h1 class="title" >Problem</h1>
+		</div>
 	</div>
-
-	<div class="field is-grouped" >
-		<div class="control" >
-			<a class="button is-primary is-outlined"
-			   href="{{ request.path }}/edit" >Edit</a>
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half" >
+			<div class="box" >
+				<article class="media" >
+					<div class="media-content" >
+						<div class="content" >
+							<p>
+								<strong>{{ problem.title }}</strong>
+								<br>
+								<br>
+								{{ problem.description }}
+								<br>
+								<br>
+								Seen number: {{ problem.n_seen }}
+							</p>
+						</div>
+					</div>
+				</article>
+			</div>
+			{% if current_user.is_student %}
+				<div class="field is-grouped" >
+					<div class="control" >
+						<a class="button is-primary is-outlined"
+						   href="{{ request.path }}/edit" >Edit</a>
+					</div>
+				</div>
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}
-		
+

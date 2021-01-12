@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}Select Problems{% endblock %}
+{% block content %}
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half" >
+			<h1 class="title">Problems</h1>
+		</div>
+	</div>
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half" >
+			{% if problems %}
+				<form action="" method="post" name="problem_list" >
+					{% for problem_key, problem in problems %}
+						<div class="box" >
+							<article class="media-content" >
+								<div class="content" >
+									<p>
+										<strong>{{ problem.title }}</strong>
+										<br>
+										<br>
+										{{ problem.description }}
+										<br>
+										<br>
+									</p>
+								</div>
+								<div class="field is-grouped" >
+									<div class="control" >
+										<a class="button is-link" href="{{ request.path }}/{{problem_key}}/select">
+											Select</a>
+									</div>
+
+								</div>
+							</article>
+						</div>
+
+					{% endfor %}
+
+				</form>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

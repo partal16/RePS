@@ -24,7 +24,7 @@ class Database:
             raise Exception('Selection {0} not found in the {1} file'.format(section, self.dbfile))
         return db
 
-    def add_problem(self, problem, build):
+    def add_problem(self, problem, build, email):
         """ insert a new problem into the problem table"""
         sql = """INSERT INTO problem(title, description, number_of_seen)
                  VALUES(%s, %s, %s) RETURNING problem_id; """
@@ -33,6 +33,7 @@ class Database:
                     VALUES(%s, %s);"""
         sql3 = """INSERT INTO build(problem_id, name)
                   VALUES(%s, %s); """
+        sql4 = """SELECT student_id FROM student WHERE email = %s;"""
 
         conn = None
         p_id = None
@@ -43,7 +44,9 @@ class Database:
             cur = conn.cursor()
             cur.execute(sql, (problem.title, problem.description, problem.n_seen,))
             p_id = cur.fetchone()[0]
-            cur.execute(sql2_1, (p_id, 5,))
+            cur.execute(sql4, (email,))
+            s_id = cur.fetchone()[0]
+            cur.execute(sql2_1, (p_id, s_id,))
             cur.execute(sql3, (p_id, build.b_name,))
             conn.commit()
             cur.close()
@@ -118,6 +121,22 @@ class Database:
                 conn.close()
         return s_problem
 
+    def cancel_problem(self, problem_key):
+        sql = """DELETE FROM ended WHERE problem_id = %s;"""
+        conn = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (problem_key,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
     
     def get_problems(self):
         sql = """SELECT problem_id, title, description, number_of_seen 
@@ -140,6 +159,79 @@ class Database:
                 conn.close()
 
         return problems
+
+    def get_user_problems(self, email, check):
+        if check:
+            sql = """SELECT student_id FROM student WHERE email = %s;"""
+            sql2 = """SELECT problem_id FROM notifying WHERE student_id = %s;"""
+            sql3 = """SELECT problem_id, title, description, number_of_seen
+                      FROM problem WHERE problem_id = %s;"""
+        else:
+            sql = """SELECT id_number FROM authorized_person WHERE email = %s;"""
+            sql2 = """SELECT problem_id FROM ended WHERE id_number = %s;"""
+            sql3 = """SELECT problem_id, title, description, number_of_seen
+                      FROM problem WHERE problem_id = %s;"""
+        conn = None
+        u_id = None
+        p_ids = None
+        problems = []
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (email,))
+            u_id = cur.fetchone()
+            cur.execute(sql2, (u_id,))
+            p_ids = cur.fetchall()
+
+            for p_id in p_ids:
+                cur.execute(sql3, (p_id,))
+                problem = cur.fetchone()
+                problems.append((problem[0], Problem(problem[1], problem[2],
+                                                     n_seen=problem[3])))
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return problems
+
+    def get_not_started_problems(self):
+        sql = """SELECT problem_id FROM ended"""
+        sql2 = """SELECT problem_id, title, description, number_of_seen
+                  FROM problem WHERE problem_id = %s"""
+        sql3 = """SELECT problem_id FROM problem;"""
+        
+        conn = None
+        p_ids = None
+        np_ids = None
+        problems = []
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql)
+            p_ids = cur.fetchall()
+            print(p_ids)
+            cur.execute(sql3)
+            np_ids = cur.fetchall()
+            for np_id in np_ids:
+                if np_id not in p_ids:
+                    cur.execute(sql2, (np_id,))
+                    problem = cur.fetchone()
+                    problems.append((problem[0], Problem(problem[1], problem[2],
+                                                         n_seen=problem[3])))
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return problems
+
 
     def add_student(self, student):
         sql = """SELECT student_id FROM student WHERE email = %s;"""
@@ -232,3 +324,24 @@ class Database:
 
         return a_id
 
+    def select_problem(self, problem_key, email):
+        sql = """INSERT INTO ended(problem_id, id_number)
+                 VALUES(%s, %s);"""
+        sql2 = """SELECT id_number FROM authorized_person WHERE email = %s;"""
+        conn = None
+        a_id = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql2, (email,))
+            a_id = cur.fetchone()[0]
+            print(a_id)
+            cur.execute(sql, (problem_key, a_id,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()

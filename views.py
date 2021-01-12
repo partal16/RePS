@@ -115,11 +115,22 @@ def problems_page():
             db.delete_problem(int(form_problem_key))
         return redirect(url_for("problems_page"))
 
+def my_problems_page():
+    db = current_app.config["db"]
+    if request.method == "GET":
+        problems = db.get_user_problems(current_user.email, current_user.is_student)
+        return render_template("my_problems_page.html", problems=sorted(problems))
+
     
 def problem_delete(problem_key):
     db = current_app.config["db"]
     db.delete_problem(problem_key)
     return redirect(url_for("problems_page"))
+
+def problem_cancel(problem_key):
+    db = current_app.config["db"]
+    db.cancel_problem(problem_key)
+    return redirect(url_for("my_problems_page"))
 
 
 def problem_page(problem_key):
@@ -139,10 +150,20 @@ def problem_add_page():
         problem = Problem(form_title, form_description)
         build = Build(form_build)
         db = current_app.config["db"]
-        problem_key = db.add_problem(problem, build)
+        problem_key = db.add_problem(problem, build, current_user.email)
         return redirect(url_for("problem_page", problem_key=problem_key))
     return render_template("problem_add.html", form=form)
 
+def problem_select_page():
+    db = current_app.config["db"]
+    if request.method == "GET":
+        problems = db.get_not_started_problems()
+        return render_template("select_problem.html", problems=sorted(problems))
+
+def problem_select(problem_key):
+    db = current_app.config["db"]
+    db.select_problem(problem_key, current_user.email)
+    return redirect(url_for("my_problems_page"))
 
 def problem_edit_page(problem_key):
     db = current_app.config["db"]
