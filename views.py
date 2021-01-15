@@ -4,7 +4,7 @@ from student import Student
 from authorized_person import AuthorizedPerson
 from build import Build
 
-from forms import ProblemAddForm, ProblemEditForm, StudentAddForm
+from forms import ProblemAddForm, ProblemEditForm
 from flask import (
     abort, current_app, redirect, render_template, request, url_for, flash
 )
@@ -25,13 +25,16 @@ def sign_up_page():
 
 def student_add_page():
     if request.method == "GET":
-        values = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        values = {"first_name": "", "last_name": "", "email": "", "password": "",
+                  "faculty": "", "s_question": ""}
         return render_template("student_edit.html", values=values)
     else:
         f_n = request.form["first_name"]
         l_n = request.form["last_name"]
         e = request.form["email"]
         p = request.form["password"]
+        fa = request.form["faculty"]
+        sq = request.form["s_question"]
 
         error = None
         db = current_app.config["db"]
@@ -40,25 +43,29 @@ def student_add_page():
 
         if error is None:
             p = hasher.hash(p)
-            student = Student(e, f_n, l_n, p)
+            student = Student(e, f_n, l_n, p, fa, sq)
             db.add_student(student)
             return redirect(url_for("login_page"))
 
         flash(error)
         
-        values = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        values = {"first_name": "", "last_name": "", "email": "", "password": "",
+                  "faculty": "", "s_question": ""}
         return render_template("student_edit.html", values=values)
 
     
 def authorized_add_page():
     if request.method == "GET":
-        values = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        values = {"first_name": "", "last_name": "", "email": "", "password": "",
+                  "s_question": "", "code": ""}
         return render_template("authorized_edit.html", values=values)
     else:
         f_n = request.form["first_name"]
         l_n = request.form["last_name"]
         e = request.form["email"]
         p = request.form["password"]
+        sq = request.form["s_question"]
+        c = request.form["code"]
 
         error = None
         db = current_app.config["db"]
@@ -66,13 +73,23 @@ def authorized_add_page():
             error = "Email {} is already registered.".format(str(e))
 
         if error is None:
+            if c != "ITU-Auth":
+                error = "Verification code is not corret"
+                flash(error)
+                values = {"first_name": "", "last_name": "", "email": "",
+                          "password": "", "s_question": "", "code": ""}
+        
+                return render_template("authorized_edit.html", values=values)
+
+        if error is None:
             p = hasher.hash(p)
-            authorized = AuthorizedPerson(e, f_n, l_n, p)
+            authorized = AuthorizedPerson(e, f_n, l_n, p, sq, c)
             db.add_authorized(authorized)
             return redirect(url_for("login_page"))
 
         flash(error)
-        value = {"first_name": "", "last_name": "", "email": "", "password": ""}
+        value = {"first_name": "", "last_name": "", "email": "", "password": "",
+                 "s_question": "", "code": ""}
         return redirect(url_for("login_page"))
 
 
@@ -85,6 +102,7 @@ def login_page():
         email = request.form["email"]
         password = request.form["password"]
         user = get_user(email)
+        print(user.password)
         if user is not None:
             if hasher.verify(password, user.password):
                 login_user(user)
@@ -103,6 +121,14 @@ def logout_page():
     flash("You have logged out.")
     return redirect(url_for("home_page"))
 
+def profile_page():
+    db = current_app.config["db"]
+    if request.method == "GET":
+        if current_user.is_student:
+            user_data = db.get_student(current_user.email)
+        else:
+            user_data = db.get_authorized(current_user.email)
+        return render_template("profile.html", user_data=user_data)
 
 def problems_page():
     db = current_app.config["db"]
@@ -125,11 +151,17 @@ def my_problems_page():
 def problem_delete(problem_key):
     db = current_app.config["db"]
     db.delete_problem(problem_key)
-    return redirect(url_for("problems_page"))
+    return redirect(url_for("my_problems_page"))
+
 
 def problem_cancel(problem_key):
     db = current_app.config["db"]
     db.cancel_problem(problem_key)
+    return redirect(url_for("my_problems_page"))
+
+def problem_finish(problem_key):
+    db = current_app.config["db"]
+    db.finish_problem(problem_key)
     return redirect(url_for("my_problems_page"))
 
 
@@ -147,7 +179,9 @@ def problem_add_page():
         form_title = request.form["title"]
         form_description = request.form["description"]
         form_build = request.form["build"]
-        problem = Problem(form_title, form_description)
+        form_solution_r = request.form["solution_r"]
+        form_privacy = request.form["privacy"]
+        problem = Problem(form_title, form_description, form_privacy, form_solution_r)
         build = Build(form_build)
         db = current_app.config["db"]
         problem_key = db.add_problem(problem, build, current_user.email)

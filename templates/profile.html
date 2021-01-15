@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+	<h1 class="title" >Profile</h1>
+
+	{% if user_data %}
+		{{ user_data[0] }}
+		{{ user_data[1] }}
+		{{ user_data[3] }}
+		{{ user_data[4] }}
+	{% endif %}
+{% endblock %}

@@ -11,7 +11,7 @@
 			<nav class="navbar" role="navigation" aria-label="main navigation">
 				<div class="navbar-brand">
 					<a class="navbar-item" href="{{ url_for('home_page') }}">
-						<img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+						<strong>RePS</strong>
 					</a>
 
 					<a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -54,13 +54,18 @@
 					<div class="navbar-end">
 						<div class="navbar-item">
 							<div class="buttons">
+								{% if current_user.email %}
+									<a class="button is-light" href="{{ url_for('profile_page') }}">
+										Profile
+									</a>
+								{% endif %}
 								{% if not current_user.email %}
-									<a class="button is-primary" href="{{ url_for('sign_up_page') }}">
-										<strong>Sign up</strong>
-									</a>
-									<a class="button is-light" href="{{ url_for('login_page') }}">
-										Log in
-									</a>
+										<a class="button is-primary" href="{{ url_for('sign_up_page') }}">
+											<strong>Sign up</strong>
+										</a>
+										<a class="button is-light" href="{{ url_for('login_page') }}">
+											Log in
+										</a>
 								{% endif %}
 								{% if current_user.email %}
 									<a class="button is-light" href="{{ url_for('logout_page') }}">
@@ -93,7 +98,7 @@
 				</div>
 			</section>
 		</main>
-
+		<br><br><br><br><br><br><br><br><br><br><br><br><br>
 		<footer class="footer">
 			<div class="content has-text-centered"
 				<p>&copy; 2020 Enes Partal</p>

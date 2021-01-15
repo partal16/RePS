@@ -39,6 +39,10 @@
 										{% endif %}
 										{% if not current_user.is_student %}
 											<div class="control" >
+												<a class="button is-primary" href="{{ request.path }}/{{problem_key}}/finish">
+													Finish</a>
+											</div>
+											<div class="control" >
 												<a class="button is-danger" href="{{ request.path }}/{{problem_key}}/cancel" >
 													Cancel</a>
 											</div>

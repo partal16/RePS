@@ -26,8 +26,8 @@ class Database:
 
     def add_problem(self, problem, build, email):
         """ insert a new problem into the problem table"""
-        sql = """INSERT INTO problem(title, description, number_of_seen)
-                 VALUES(%s, %s, %s) RETURNING problem_id; """
+        sql = """INSERT INTO problem(title, description, privacy, solution_r, number_of_seen)
+                 VALUES(%s, %s, %s, %s, %s) RETURNING problem_id; """
 
         sql2_1 = """INSERT INTO notifying(problem_id, student_id)
                     VALUES(%s, %s);"""
@@ -42,7 +42,8 @@ class Database:
             params = self.config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            cur.execute(sql, (problem.title, problem.description, problem.n_seen,))
+            cur.execute(sql, (problem.title, problem.description,
+                              problem.privacy, problem.solution_r, problem.n_seen,))
             p_id = cur.fetchone()[0]
             cur.execute(sql4, (email,))
             s_id = cur.fetchone()[0]
@@ -99,7 +100,7 @@ class Database:
 
 
     def get_problem(self, problem_key):
-        sql = """SELECT title, description, number_of_seen 
+        sql = """SELECT title, description, privacy, solution_r, number_of_seen 
                  FROM problem WHERE problem_id = %s;"""
         conn = None
         title = None
@@ -111,8 +112,9 @@ class Database:
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             cur.execute(sql, (problem_key,))
-            title, description, n_seen = cur.fetchone()
-            s_problem = Problem(title, description, n_seen=n_seen)
+            title, description, privacy, solution_r, n_seen = cur.fetchone()
+            s_problem = Problem(title, description, privacy,
+                                solution_r, n_seen=n_seen)
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -137,9 +139,26 @@ class Database:
             if conn is not None:
                 conn.close()
 
+    def finish_problem(self, problem_key):
+        sql = """UPDATE ended SET ended_date = CURRENT_DATE
+                 WHERE problem_id = %s;"""
+        conn = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (problem_key,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
     
     def get_problems(self):
-        sql = """SELECT problem_id, title, description, number_of_seen 
+        sql = """SELECT problem_id, title, description, privacy, solution_r, number_of_seen 
                  FROM problem ORDER BY problem_id;"""
         conn = None
         problems = []
@@ -149,8 +168,8 @@ class Database:
             cur = conn.cursor()
             cur.execute(sql)
             rows = cur.fetchall()
-            for problem_key, title, desc, n_s in rows:
-                problems.append((problem_key, Problem(title, desc, n_seen=n_s)))
+            for problem_key, title, desc, pri, sol, n_s in rows:
+                problems.append((problem_key, Problem(title, desc, pri, sol, n_seen=n_s)))
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -164,13 +183,14 @@ class Database:
         if check:
             sql = """SELECT student_id FROM student WHERE email = %s;"""
             sql2 = """SELECT problem_id FROM notifying WHERE student_id = %s;"""
-            sql3 = """SELECT problem_id, title, description, number_of_seen
-                      FROM problem WHERE problem_id = %s;"""
+
         else:
             sql = """SELECT id_number FROM authorized_person WHERE email = %s;"""
-            sql2 = """SELECT problem_id FROM ended WHERE id_number = %s;"""
-            sql3 = """SELECT problem_id, title, description, number_of_seen
-                      FROM problem WHERE problem_id = %s;"""
+            sql2 = """SELECT problem_id FROM ended 
+                      WHERE id_number = %s AND ended_date is null;"""
+
+        sql3 = """SELECT problem_id, title, description, privacy, solution_r, number_of_seen
+                  FROM problem WHERE problem_id = %s;"""
         conn = None
         u_id = None
         p_ids = None
@@ -188,7 +208,8 @@ class Database:
                 cur.execute(sql3, (p_id,))
                 problem = cur.fetchone()
                 problems.append((problem[0], Problem(problem[1], problem[2],
-                                                     n_seen=problem[3])))
+                                                     problem[3], problem[4],
+                                                     n_seen=problem[5])))
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -200,7 +221,7 @@ class Database:
 
     def get_not_started_problems(self):
         sql = """SELECT problem_id FROM ended"""
-        sql2 = """SELECT problem_id, title, description, number_of_seen
+        sql2 = """SELECT problem_id, title, description, privacy, solution_r, number_of_seen
                   FROM problem WHERE problem_id = %s"""
         sql3 = """SELECT problem_id FROM problem;"""
         
@@ -214,7 +235,6 @@ class Database:
             cur = conn.cursor()
             cur.execute(sql)
             p_ids = cur.fetchall()
-            print(p_ids)
             cur.execute(sql3)
             np_ids = cur.fetchall()
             for np_id in np_ids:
@@ -222,7 +242,8 @@ class Database:
                     cur.execute(sql2, (np_id,))
                     problem = cur.fetchone()
                     problems.append((problem[0], Problem(problem[1], problem[2],
-                                                         n_seen=problem[3])))
+                                                         problem[3], problem[4],
+                                                         n_seen=problem[5])))
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -235,8 +256,9 @@ class Database:
 
     def add_student(self, student):
         sql = """SELECT student_id FROM student WHERE email = %s;"""
-        sql2 = """INSERT INTO student(email, first_name, last_name, password)
-                  VALUES(%s, %s, %s, %s) RETURNING student_id;"""
+        sql2 = """INSERT INTO student(email, first_name, last_name, password, 
+                  faculty, s_question)
+                  VALUES(%s, %s, %s, %s, %s, %s) RETURNING student_id;"""
         conn = None
         s_id = None
         try:
@@ -247,7 +269,8 @@ class Database:
             s_id = cur.fetchone()
             if s_id is None:
                 cur.execute(sql2, (student.email, student.first_name,
-                                   student.last_name, student.password,))
+                                   student.last_name, student.password,
+                                   student.faculty, student.s_question,))
                 s_id = cur.fetchone()[0]
             conn.commit()
             cur.close()
@@ -258,7 +281,8 @@ class Database:
                 conn.close()
 
     def get_student(self, student_email):
-        sql = """SELECT student_id, email, password FROM student WHERE email = %s;"""
+        sql = """SELECT student_id, email, password, first_name, last_name, faculty 
+                 FROM student WHERE email = %s;"""
         conn = None
         s_id = None
         try:
@@ -279,8 +303,9 @@ class Database:
 
     def add_authorized(self, authorized):
         sql = """SELECT id_number FROM authorized_person WHERE email = %s;"""
-        sql2 = """INSERT INTO authorized_person(email, first_name, last_name, password)
-                  VALUES(%s, %s, %s, %s) RETURNING id_number;"""
+        sql2 = """INSERT INTO authorized_person(email, first_name, last_name, password,
+                  s_question, code)
+                  VALUES(%s, %s, %s, %s, %s, %s) RETURNING id_number;"""
         conn = None
         a_id = None
         try:
@@ -289,10 +314,10 @@ class Database:
             cur = conn.cursor()
             cur.execute(sql, (authorized.email,))
             a_id = cur.fetchone()
-            print(a_id)
             if a_id is None:
                 cur.execute(sql2, (authorized.email, authorized.f_name,
-                                   authorized.l_name, authorized.passw,))
+                                   authorized.l_name, authorized.passw,
+                                   authorized.s_question, authorized.code))
                 a_id = cur.fetchone()[0]
             print(a_id)
             conn.commit()
@@ -304,8 +329,8 @@ class Database:
                 conn.close()
 
     def get_authorized(self, auth_email):
-        sql = """SELECT id_number, email, password FROM authorized_person 
-                 WHERE email = %s;"""
+        sql = """SELECT id_number, email, password, first_name, last_name 
+                 FROM authorized_person WHERE email = %s;"""
         conn = None
         a_id = None
         try:
@@ -336,7 +361,6 @@ class Database:
             cur = conn.cursor()
             cur.execute(sql2, (email,))
             a_id = cur.fetchone()[0]
-            print(a_id)
             cur.execute(sql, (problem_key, a_id,))
             conn.commit()
             cur.close()

@@ -3,12 +3,12 @@
 {% block content %}
 	<br>
 	<div class="columns is-desktop is-centered">
-		<div class="column is-half" >
+		<div class="column is-one-quarter" >
 			<h1 class="title" >Student Sign up</h1>
 		</div>
 	</div>
 	<div class="columns is-desktop is-centered" >
-		<div class="column is-half" >
+		<div class="column is-one-quarter" >
 			<form action="" method="post" name="student_edit" >
 				<div class="field" >
 					<label for="first_name" class="label" >First Name</label>
@@ -41,7 +41,23 @@
 							   value="{{ values['password'] }}" />
 					</div>
 				</div>
-				
+
+				<div class="field" >
+					<label for="faculty" class="label" >Facult</label>
+					<div class="control" >
+						<input type="text" name="faculty" class="input" required="required"
+							   value="{{ values['faculty'] }}" />
+					</div>
+				</div>
+
+				<div class="field" >
+					<label for="s_question" class="label" >What is your favorite color</label>
+					<div class="control" >
+						<input type="text" name="s_question" class="input" required="required"
+							   value="{{ values['s_question'] }}" />
+					</div>
+				</div>
+
 				<div class="field is-grouped" >
 					<div class="control" >
 						<button class="button is-link" >Sign up</button>

@@ -12,7 +12,8 @@ def create_tables():
             first_name VARCHAR(30) NOT NULL,
             last_name VARCHAR(30) NOT NULL,
             password TEXT NOT NULL,
-            active BOOLEAN NOT NULL
+            faculty TEXT NOT NULL,
+            s_question TEXT NOT NULL
         )
         """,
         """
@@ -20,6 +21,8 @@ def create_tables():
             problem_id SERIAL PRIMARY KEY,
             title VARCHAR(20) NOT NULL,
             description VARCHAR(140) NOT NULL,
+            privacy BOOLEAN NOT NULL,
+            solution_r VARCHAR(140) NOT NULL,
             number_of_seen INT
         )
         """,
@@ -41,14 +44,15 @@ def create_tables():
             first_name VARCHAR(30) NOT NULL,
             last_name VARCHAR(30) NOT NULL,
             password TEXT NOT NULL,
-            active BOOLEAN NOT NULL
+            s_question TEXT NOT NULL,
+            code TEXT NOT NULL
         )
         """,
         """
         CREATE TABLE ended (
             problem_id INTEGER PRIMARY KEY,
             id_number INTEGER,
-            ended_date DATE DEFAULT CURRENT_DATE,
+            ended_date DATE,
             CONSTRAINT fk_problem
                 FOREIGN KEY(problem_id)
                     REFERENCES problem(problem_id),
