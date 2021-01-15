@@ -1,12 +1,49 @@
 {% extends "layout.html" %}
 {% block title %}Profile{% endblock %}
 {% block content %}
-	<h1 class="title" >Profile</h1>
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-one-quarter" >
+			<h1 class="title" >Profile</h1>
+		</div>
+	</div>
 
 	{% if user_data %}
-		{{ user_data[0] }}
-		{{ user_data[1] }}
-		{{ user_data[3] }}
-		{{ user_data[4] }}
+		<div class="columns is-desktop is-centered" >
+			<div class="column is-one-quarter" >
+				<div class="box">
+					<div class="media-content" >
+						<div class="content" >
+							<p>
+								<h5>First Name</h5>
+								<p>{{user_data[3]}}</p>
+								<h5>Last Name</h5>
+								<p>{{ user_data[4] }}</p>
+								<h5>Email</h5>
+								<p>{{ user_data[1] }}</p>
+								{% if current_user.is_student %}
+									<h5>Faculty</h5>
+									<p>{{ user_data[5] }}</p>
+								{% endif %}
+							</p>
+							<h5> Do you want to change your password? </h5>
+							<br>
+							<div class="columns is-centered" >
+								<div class="field is-grouped" >
+									<div class="control" >
+										<a class="button is-primary" href="{{url_for('new_password_page')}}">
+											Yes</a>
+									</div>
+									<div class="control" >
+										<a class="button is-danger" >
+											No</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	{% endif %}
 {% endblock %}

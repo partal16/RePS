@@ -54,6 +54,8 @@ def create_app():
     app.add_url_rule("/new-student", view_func=views.student_add_page, methods=["GET", "POST"],)
     app.add_url_rule("/new-authorized", view_func=views.authorized_add_page,
                      methods=["GET", "POST"],)
+    app.add_url_rule("/new-password", view_func=views.new_password_page,
+                     methods=["GET", "POST"],)
 
     lm.init_app(app)
     lm.login_view = "login_page"

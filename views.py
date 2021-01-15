@@ -102,7 +102,6 @@ def login_page():
         email = request.form["email"]
         password = request.form["password"]
         user = get_user(email)
-        print(user.password)
         if user is not None:
             if hasher.verify(password, user.password):
                 login_user(user)
@@ -129,6 +128,42 @@ def profile_page():
         else:
             user_data = db.get_authorized(current_user.email)
         return render_template("profile.html", user_data=user_data)
+
+def new_password_page():
+    db = current_app.config["db"]
+    error = None
+    if request.method == "GET":
+        values = {"old_password": "", "s_question": "", "new_password": ""}
+        return render_template("new_password.html", values=values)
+    else:
+        old_password = request.form["old_password"]
+        s_question = request.form["s_question"]
+        new_password = request.form["new_password"]
+        user = get_user(current_user.email)
+        if hasher.verify(old_password, user.password):
+            if current_user.is_student:
+                if s_question == db.get_student(current_user.email)[-1]:
+                    db.change_password(current_user.email, hasher.hash(new_password),
+                                       current_user.is_student)
+                else:
+                    error = "Security question's answer is incorrect"
+            else:
+                if s_question == db.get_authorized(current_user.email)[-1]:
+                    db.change_password(current_user.email, hasher.hash(new_password),
+                                       current_user.is_student)
+                else:
+                    error = "Security question's answer is incorrect"
+        else:
+            error = "Old password is incorrect"
+
+        if error is not None:
+            flash(error)
+            values = {"old_password": "", "s_question": "", "new_password": ""}
+            return render_template("new_password.html", values=values)
+
+        flash("Your password is changed")
+        return redirect(url_for("profile_page"))
+            
 
 def problems_page():
     db = current_app.config["db"]

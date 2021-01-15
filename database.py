@@ -281,7 +281,7 @@ class Database:
                 conn.close()
 
     def get_student(self, student_email):
-        sql = """SELECT student_id, email, password, first_name, last_name, faculty 
+        sql = """SELECT student_id, email, password, first_name, last_name, faculty, s_question 
                  FROM student WHERE email = %s;"""
         conn = None
         s_id = None
@@ -329,7 +329,7 @@ class Database:
                 conn.close()
 
     def get_authorized(self, auth_email):
-        sql = """SELECT id_number, email, password, first_name, last_name 
+        sql = """SELECT id_number, email, password, first_name, last_name, s_question
                  FROM authorized_person WHERE email = %s;"""
         conn = None
         a_id = None
@@ -362,6 +362,26 @@ class Database:
             cur.execute(sql2, (email,))
             a_id = cur.fetchone()[0]
             cur.execute(sql, (problem_key, a_id,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+    def change_password(self, email, n_password, is_student):
+        if is_student:
+            sql = """UPDATE student SET password = %s WHERE email = %s;"""
+        else:
+            sql = """UPDATE authorized_person SET password = %s WHERE email = %s;"""
+
+        conn = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (n_password, email,))
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
