@@ -1,12 +1,46 @@
 {% extends "layout.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-	<section class="hero" >
-		<div class="hero-body" >
-			<div class="container has-text-centered" >
-				<h1 class ="title">Hello, Welcome to the PRS</h1>
-				<p class ="subtitle">Have you any problen on {{ day }}</p>
-			</div>
+	<br>
+	<div class="columns is-desktop is-centered">
+		<div class="column is-one-quarter" >
+			<h1 class="title">Reported Problems</h1>
 		</div>
-	</section>
+	</div>
+	{% if public_problems %}
+		<form action="" method="post" name="problem_list" >
+			<br>
+			<div class="columns is-desktop is-centered">
+				<div class="column is-half" >
+					{% for problem_key, problem in public_problems %}
+						<div class="box" >
+							<article class="media" >
+								<div class="media-left" >
+									<figure class="image is-64x64" >
+									</figure>
+								</div>
+								<div class="media-content" >
+									<div class="content" >
+										<p>
+											<p><strong>{{ problem.title.title() }}</strong><br>
+												{{ problem.description.capitalize() }}</p>
+											Seen number: {{ problem.n_seen }}													<p>Did you see this problem?  </p>
+											{% if current_user.is_student %}
+												<div class="field is-grouped" >
+													<div class="control" >
+														<a class="button is-link" href="{{ request.paht }}/{{problem_key}}/increase" >
+															<strong>Yes</strong></a>
+													</div>
+												</div>
+											{% endif %}
+										</p>
+									</div>
+								</div>
+							</article>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</form>
+	{% endif %}
 {% endblock %}

@@ -27,7 +27,7 @@
 				<div class="field" >
 					<label for="description" class="label" >Description</label>
 					<div class="control" >
-						{{ form.description(required=True, autofocus=True, class="input") }}
+						{{ form.description(required=True, autofocus=True, class="textarea") }}
 					</div>
 					{% for error in form.description.errors %}
 						<p class="help has-background-warning">
@@ -49,9 +49,9 @@
 				</div>
 
 				<div class="field" >
-					<label for="solution_r" class="label" >Solution</label>
+					<label for="solution_r" class="label" >Solution Proposal (optional)</label>
 					<div class="control" >
-						{{ form.solution_r(required=True, autofocus=True, class="input") }}
+						{{ form.solution_r(required=True, autofocus=True, class="textarea") }}
 					</div>
 					{% for error in form.solution_r.errors%}
 						<p class="help has-background-warning">

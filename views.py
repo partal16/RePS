@@ -12,11 +12,28 @@ from passlib.hash import pbkdf2_sha256 as hasher
 from user import get_user
 from flask_login import login_user, logout_user, current_user
 
+def take_first(problems):
+    return problems[0]
 
 def home_page():
-    today = datetime.today()
-    day_name = today.strftime("%A")
-    return render_template("home.html", day=day_name)
+    db = current_app.config["db"]
+    if request.method == "GET":
+        problems = db.get_problems()
+        public_problems = []
+        f_problems = db.get_finished_problems()
+        print(f_problems)
+        for problem in problems:
+            if (problem[0] not in f_problems) and problem[1].privacy:
+                public_problems.append(problem)
+    return render_template("home.html", public_problems=sorted(public_problems,
+                                                               key=take_first,
+                                                               reverse=True))
+
+
+def seen_increase(problem_key):
+    db = current_app.config["db"]
+    db.increase_seen(problem_key)
+    return redirect(url_for("home_page"))
 
 
 def sign_up_page():
@@ -241,10 +258,12 @@ def problem_edit_page(problem_key):
     if form.validate_on_submit():
         title = form.data["title"]
         description = form.data["description"]
-        problem = Problem(title, description)
-        db.update_problem(problem_key, problem)
+        solution_r = form.data["solution_r"]
+        n_problem = Problem(title, description, problem.privacy, solution_r)
+        db.update_problem(problem_key, n_problem)
         return redirect(url_for("problem_page", problem_key=problem_key))
     form.title.data = problem.title
     form.description.data = problem.description
+    form.solution_r.data = problem.solution_r
     return render_template("problem_edit.html", form=form,)
 

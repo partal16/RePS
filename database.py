@@ -60,13 +60,15 @@ class Database:
 
     
     def update_problem(self, problem_key, problem):
-        sql = """UPDATE problem SET title = %s, description = %s WHERE problem_id = %s;"""
+        sql = """UPDATE problem SET title = %s, description = %s, solution_r = %s
+                 WHERE problem_id = %s;"""
         conn = None
         try:
             params = self.config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            cur.execute(sql, (problem.title, problem.description, problem_key,))
+            cur.execute(sql, (problem.title, problem.description,
+                              problem.solution_r, problem_key,))
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -155,6 +157,28 @@ class Database:
         finally:
             if conn is not None:
                 conn.close()
+
+    def get_finished_problems(self):
+        sql = """SELECT problem_id FROM ended WHERE ended_date is not null;"""
+        conn = None
+        f_prs = None
+        f_ids = []
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql)
+            f_prs = cur.fetchall()
+            for problem_key, in f_prs:
+                f_ids.append(problem_key)
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+        return f_ids
 
     
     def get_problems(self):
@@ -382,6 +406,27 @@ class Database:
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             cur.execute(sql, (n_password, email,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+    def increase_seen(self, problem_key):
+        sql = """UPDATE problem SET number_of_seen = %s WHERE problem_id = %s;"""
+        sql2 = """SELECT number_of_seen FROM problem WHERE problem_id = %s;"""
+        conn = None
+        n_seen = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql2, (problem_key,))
+            n_seen = cur.fetchone()[0]
+            n_seen += 1
+            cur.execute(sql, (n_seen, problem_key,))
             conn.commit()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:

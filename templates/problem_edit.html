@@ -1,43 +1,63 @@
 {% extends "layout.html" %}
 {% block title %}Edit Problem{% endblock %}
 {% block content %}
-	<h1 class="title" >Edit Problem</h1>
+	<br>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half" >
+			<h1 class="title" >Edit Problem</h1>
+		</div>
+	</div>
+	<div class="columns is-desktop is-centered" >
+		<div class="column is-half" >
+			<form action="" method="post" name="problem_edit" >
+				{{ form.csrf_token }}
+				
+				<div class="field" >
+					<label for="title" class="label" >Title</label>
+					<div class="control" >
+						{{ form.title(required=True, autofocus=True, class="input") }}
+					</div>
+					{% for error in form.title.errors %}
+						<p class="help has-background-warning">
+							{{ error }}
+						</p>
+					{% endfor %}
+				</div>
 
-	<form action="" method="post" name="problem_edit" >
-		{{ form.csrf_token }}
-		
-		<div class="field" >
-			<label for="title" class="label" >Title</label>
-			<div class="control" >
-				{{ form.title(required=True, autofocus=True, class="input") }}
-			</div>
-			{% for error in form.title.errors %}
-				<p class="help has-background-warning">
-					{{ error }}
-				</p>
-			{% endfor %}
-		</div>
+				<div class="field" >
+					<label for="description" class="label" >Description</label>
+					<div class="control" >
+						{{ form.description(required=True, autofocus=True, class="textarea") }}
+					</div>
+					{% for error in form.description.errors %}
+						<p class="help has-background-warning">
+							{{ error }}
+						</p>
+					{% endfor %}
+				</div>
 
-		<div class="field" >
-			<label for="description" class="label" >Description</label>
-			<div class="control" >
-				{{ form.description(required=True, autofocus=True, class="input") }}
-			</div>
-			{% for error in form.description.errors %}
-				<p class="help has-background-warning">
-					{{ error }}
-				</p>
-			{% endfor %}
+				<div class="field" >
+					<label for="solution_r" class="label" >Solution </label>
+					<div class="control" >
+						{{ form.solution_r(required=True, autofocus=True, class="textarea") }}
+					</div>
+					{% for error in form.description.errors %}
+						<p class="help has-background-warning">
+							{{ error }}
+						</p>
+					{% endfor %}
+				</div>
+				
+				<div class="field is-grouped" >
+					<div class="control" >
+						<button class="button is-link" >Save</button>
+					</div>
+					<div class="control" >
+						<a class="button is-light" href="{{ url_for('home_page')}}">
+							Cancel</a>
+					</div>
+				</div>
+			</form>
 		</div>
-		
-		<div class="field is-grouped" >
-			<div class="control" >
-				<button class="button is-link" >Save</button>
-			</div>
-			<div class="control" >
-				<a class="button is-light" href="{{ url_for('home_page')}}">
-					Cancel</a>
-			</div>
-		</div>
-	</form>
+	</div>
 {% endblock %}

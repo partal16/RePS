@@ -17,7 +17,7 @@
 							<tr>
 								<td>
 									<a href="{{ url_for('problem_page', problem_key=problem_key) }}">
-										{{ problem.title }}
+										{{ problem.title.title() }}
 									</a>
 								</td>
 								<td>
