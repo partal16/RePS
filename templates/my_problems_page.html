@@ -12,20 +12,22 @@
 		<div class="column is-one-quarter" >
 			{% if problems %}
 				<form action="" method="post" name="problem_list" >
+					<h1 class="title" >Unsolved Problems</h1>
 					{% for problem_key, problem in problems %}
-						<div class="box" >
-							<article class="media-content" >
-								<div class="content" >
-									<br>
-									{% if current_user.is_student %}
-										<label class="checkbox" >
-											<input type="checkbox" name="problem_keys" value="{{ problem_key }}"/>
-										</label>
-									{% endif %}
-									<a href="{{ url_for('problem_page', problem_key=problem_key) }}">
-										{{ problem.title.title() }}
+						{% if problem_key not in f_problems %}
+							<div class="box" >
+								<article class="media-content" >
+									<div class="content" >
+										<br>
+										{% if current_user.is_student %}
+											<label class="checkbox" >
+												<input type="checkbox" name="problem_keys" value="{{ problem_key }}"/>
+											</label>
+										{% endif %}
+										<a href="{{ url_for('problem_page', problem_key=problem_key) }}">
+											{{ problem.title.title() }}</a>
 										<p><br></p>
-										<div class="field is-grouped" >
+										<div class="field is-grouped is-grouped-right" >
 											<div class="control" >
 												<a class="button is-link" href="{{ request.path }}/{{problem_key}}">
 													Detail</a>
@@ -52,9 +54,10 @@
 												</div>
 											{% endif %}
 										</div>
-								</div>
-							</article>
-						</div>
+									</div>
+								</article>
+							</div>
+						{% endif %}
 					{% endfor %}
 					{% if current_user.is_student %}
 						<div class="field is-grouped" >
@@ -62,6 +65,30 @@
 								<button class="button is-danger" >Delete</button>
 							</div>
 						</div>
+					{% endif %}
+					{% if current_user.is_student %}
+						<br>
+						<h1 class="title">Solved Problems</h1>
+						{% for problem_key, problem in problems %}
+							{% if problem_key in f_problems %}
+								<div class="box" >
+									<article class="media-content" >
+										<div class="content" >
+											<br>
+											<a href="{{ url_for('problem_page', problem_key=problem_key) }}">
+												{{ problem.title.title() }}</a>
+											<p><br></p>
+											<div class="field is-grouped is-grouped-right" >
+												<div class="control" >
+													<a class="button is-link" href="{{ request.path }}/{{problem_key}}">
+														Detail</a>
+												</div>
+											</div>
+										</div>
+									</article>
+								</div>
+							{% endif  %}
+						{% endfor %}
 					{% endif %}
 				</form>
 			{% endif %}

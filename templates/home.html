@@ -26,15 +26,16 @@
 										<p>
 											<p><strong>{{ problem.title.title() }}</strong><br>
 												{{ problem.description.capitalize() }}</p>
-											Seen number: {{ problem.n_seen }}													<p>Did you see this problem?  </p>
+											Seen number: {{ problem.n_seen }}
 											{% if current_user.is_student %}
+												<p>Did you see this problem?  </p>
 												<div class="field is-grouped" >
 													<div class="control" >
 														<a class="button is-link" href="{{ request.paht }}/{{problem_key}}/increase" >
 															<strong>Yes</strong></a>
 													</div>
 												</div>
-											{% endif %}
+	{% endif %}
 										</p>
 									</div>
 								</div>

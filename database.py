@@ -434,3 +434,51 @@ class Database:
         finally:
             if conn is not None:
                 conn.close()
+
+    def get_dates(self, problem_key):
+        sql = """SELECT notification_date FROM notifying 
+                 WHERE problem_id = %s;"""
+        sql2 = """SELECT ended_date FROM ended
+                  WHERE problem_id = %s AND ended_date is not null;"""
+        conn = None
+        s_d = None
+        e_d = None
+        dates = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (problem_key,))
+            s_d = cur.fetchone()[0]
+            cur.execute(sql2, (problem_key,))
+            e_d = cur.fetchone()
+            if e_d == None:
+                e_d = '-'
+            else:
+                e_d = e_d[0]
+            dates = (s_d, e_d)
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+        return dates
+
+    def get_build(self, problem_key):
+        sql = """SELECT name FROM build WHERE problem_id = %s;"""
+        conn = None
+        b_n = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (problem_key,))
+            b_n = cur.fetchone()[0]
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+        return b_n
