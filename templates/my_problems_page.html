@@ -1,58 +1,68 @@
 {% extends "layout.html" %}
-{% block title %}Problems{% endblock %}
+{% block title %}My Problems{% endblock %}
 {% block content %}
 	<br>
 	<div class="columns is-desktop is-centered" >
-		<div class="column is-half" >
-			<h1 class="title">Problems</h1>
+		<div class="column is-one-quarter" >
+			<h1 class="title">My Problems</h1>
 		</div>
 	</div>
 	<br>
 	<div class="columns is-desktop is-centered" >
-		<div class="column is-half" >
+		<div class="column is-one-quarter" >
 			{% if problems %}
 				<form action="" method="post" name="problem_list" >
-					<table class="table is-striped is-fullwidth" >
-						{% for problem_key, problem in problems %}
-							<tr>
-								<td>
+					{% for problem_key, problem in problems %}
+						<div class="box" >
+							<article class="media-content" >
+								<div class="content" >
+									<br>
+									{% if current_user.is_student %}
+										<label class="checkbox" >
+											<input type="checkbox" name="problem_keys" value="{{ problem_key }}"/>
+										</label>
+									{% endif %}
 									<a href="{{ url_for('problem_page', problem_key=problem_key) }}">
 										{{ problem.title.title() }}
-									</a>
-								</td>
-								<td>
-									<div class="field is-grouped" >
-										<div class="control" >
-											<a class="button is-link" href="{{ request.path }}/{{problem_key}}">
-												Detail</a>
+										<p><br></p>
+										<div class="field is-grouped" >
+											<div class="control" >
+												<a class="button is-link" href="{{ request.path }}/{{problem_key}}">
+													Detail</a>
+											</div>
+
+											{% if current_user.is_student %}
+												<div class="control" >
+													<a class="button is-primary" href="{{ request.path }}/{{problem_key}}/edit">
+														Edit</a>
+												</div>
+												<div class="control" >
+													<a class="button is-danger" href="{{ request.path }}/{{problem_key}}/delete">
+														Delete</a>
+												</div>
+											{% endif %}
+											{% if not current_user.is_student %}
+												<div class="control" >
+													<a class="button is-primary" href="{{ request.path }}/{{problem_key}}/finish">
+														Finish</a>
+												</div>
+												<div class="control" >
+													<a class="button is-danger" href="{{ request.path }}/{{problem_key}}/cancel" >
+														Cancel</a>
+												</div>
+											{% endif %}
 										</div>
-
-										{% if current_user.is_student %}
-											<div class="control" >
-												<a class="button is-primary" href="{{ request.path }}/{{problem_key}}/edit">
-													Edit</a>
-											</div>
-											<div class="control" >
-												<a class="button is-danger" href="{{ request.path }}/{{problem_key}}/delete">
-													Delete</a>
-											</div>
-										{% endif %}
-										{% if not current_user.is_student %}
-											<div class="control" >
-												<a class="button is-primary" href="{{ request.path }}/{{problem_key}}/finish">
-													Finish</a>
-											</div>
-											<div class="control" >
-												<a class="button is-danger" href="{{ request.path }}/{{problem_key}}/cancel" >
-													Cancel</a>
-											</div>
-										{% endif %}
-									</div>
-								</td>
-							</tr>
-						{% endfor %}
-					</table>
-
+								</div>
+							</article>
+						</div>
+					{% endfor %}
+					{% if current_user.is_student %}
+						<div class="field is-grouped" >
+							<div class="control" >
+								<button class="button is-danger" >Delete</button>
+							</div>
+						</div>
+					{% endif %}
 				</form>
 			{% endif %}
 		</div>

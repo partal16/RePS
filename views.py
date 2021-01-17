@@ -197,8 +197,14 @@ def my_problems_page():
     db = current_app.config["db"]
     if request.method == "GET":
         problems = db.get_user_problems(current_user.email, current_user.is_student)
-        return render_template("my_problems_page.html", problems=sorted(problems))
-
+        return render_template("my_problems_page.html", problems=sorted(problems,
+                                                                        key=take_first,
+                                                                        reverse=True))
+    else:
+        form_problem_keys = request.form.getlist("problem_keys")
+        for form_problem_key in form_problem_keys:
+            db.delete_problem(int(form_problem_key))
+        return redirect(url_for("my_problems_page"))
     
 def problem_delete(problem_key):
     db = current_app.config["db"]
