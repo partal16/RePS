@@ -39,7 +39,7 @@
 				<div class="field" >
 					<label for="build" class="label" >Build</label>
 					<div class="control" >
-						{{ form.build(required=True, autofocus=True, class="input") }}
+						{{ form.build(required=True, autofocus=True, class="select") }}
 					</div>
 					{% for error in form.build.errors%}
 						<p class="help has-background-warning">

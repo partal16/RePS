@@ -42,11 +42,35 @@
 					</div>
 				</div>
 
-				<div class="field" >
-					<label for="faculty" class="label" >Facult</label>
+				<!-- 
+					 <div class="field" >
+					 <label for="faculty" class="label" >Faculty</label>
+					 <div class="control" >
+					 <input type="text" name="faculty" class="input" required="required"
+					 value="" />
+					 </div>
+					 </div>
+				-->
+				<div clas="field" >
+					<label for="faculty" class="label" >Faculty</label>
 					<div class="control" >
-						<input type="text" name="faculty" class="input" required="required"
-							   value="{{ values['faculty'] }}" />
+						<div class="select" >
+							<select name="faculty" required="required">
+								<option value="Faculty of Civil Engineering" >Faculty of Civil Engineering</option>
+								<option value="Faculty of Architecture" >Faculty of Architecture</option>
+								<option value="Faculty of Mechanical Engineering" >Faculty of Mechanical Engineering</option>
+								<option value="Faculty of Electrical and Electronics" >Faculty of Electrical and Electronics</option>
+								<option value="Maritime Faculty" >Maritime Faculty</option>
+								<option value="Chemical-Metallurgical Engineering Faculty" >Chemical-Metallurgical Engineering Faculty</option>
+								<option value="Faculty of Management" >Faculty of Management</option>
+								<option value="Faculty of Aeronautics and Astronautics" >Faculty of Aeronautics and Astronautics</option>
+								<option value="Faculty of Texttile Technologies and Design" >Faculty of Textile Technologies and Design</option>
+								<option value="Faculty of Mine">Faculty of Mine</option>
+								<option value="Faculty of Naval Architecture and Marine Science" >Faculty of Naval Architecture and Marine Science</option>
+								<option value="Faculty of Computer and Informatics" >Faculty of Computer and Informatics</option>
+								<option value="Faculty of Science and Letter" >Faculty of Science and Letters</option>
+							</select>
+						</div>
 					</div>
 				</div>
 
