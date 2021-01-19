@@ -100,6 +100,41 @@ class Database:
             if conn is not None:
                 conn.close()
 
+    def delete_student(self, student_id):
+        sql = """DELETE FROM notifying WHERE student_id = %s;"""
+        sql2 = """DELETE FROM student WHERE student_id = %s;"""
+        conn = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (student_id,))
+            cur.execute(sql2, (student_id,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+
+    def delete_authorized(self, authorized_id):
+        sql = """DELETE FROM ended WHERE id_number = %s;"""
+        sql2 = """DELETE FROM authorized_person WHERE id_number = %s;"""
+        conn = None
+        try:
+            params = self.config()
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+            cur.execute(sql, (authorized_id,))
+            cur.execute(sql2, (authorized_id,))
+            conn.commit()
+            cur.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if conn is not None:
+                conn.close()
 
     def get_problem(self, problem_key):
         sql = """SELECT title, description, privacy, solution_r, number_of_seen 

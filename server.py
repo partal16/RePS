@@ -24,6 +24,8 @@ def create_app():
     app.add_url_rule("/logout", view_func=views.logout_page)
     app.add_url_rule("/profile", view_func=views.profile_page,
                      methods=["GET", "POST"])
+    app.add_url_rule("/profile/<int:user_id>/delete", view_func=views.user_delete,
+                     methods=["GET", "POST"])
     app.add_url_rule("/problems", view_func=views.problems_page, methods=["GET", "POST"],)
     app.add_url_rule("/my-problems", view_func=views.my_problems_page, methods=["GET", "POST"],)
     app.add_url_rule("/no-selected-problems", view_func=views.problem_select_page,

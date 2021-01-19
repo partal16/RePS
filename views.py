@@ -212,6 +212,14 @@ def my_problems_page():
         return redirect(url_for("my_problems_page"))
 
 
+def user_delete(user_id):
+    db = current_app.config["db"]
+    if current_user.is_student:
+        db.delete_student(user_id)
+    else:
+        db.delete_authorized(user_id)
+    return redirect(url_for("logout_page"))
+    
 def problem_delete(problem_key):
     db = current_app.config["db"]
     db.delete_problem(problem_key)
