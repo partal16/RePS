@@ -26,10 +26,11 @@
 						<a class="navbar-item" href="{{ url_for('home_page') }}">
 							Home
 						</a>
-
+						<!--  
 						<a class="navbar-item" href="{{ url_for('problems_page') }}">
 							Problems
 						</a>
+						-->
 						
 						{% if current_user.email %}
 							<a class="navbar-item" href="{{ url_for('my_problems_page') }}">

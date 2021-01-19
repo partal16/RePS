@@ -136,6 +136,7 @@ def logout_page():
     flash("You have logged out.")
     return redirect(url_for("home_page"))
 
+
 def profile_page():
     db = current_app.config["db"]
     if request.method == "GET":
@@ -144,6 +145,7 @@ def profile_page():
         else:
             user_data = db.get_authorized(current_user.email)
         return render_template("profile.html", user_data=user_data)
+
 
 def new_password_page():
     db = current_app.config["db"]
@@ -192,6 +194,7 @@ def problems_page():
             db.delete_problem(int(form_problem_key))
         return redirect(url_for("problems_page"))
 
+
 def my_problems_page():
     db = current_app.config["db"]
     if request.method == "GET":
@@ -207,7 +210,8 @@ def my_problems_page():
         for form_problem_key in form_problem_keys:
             db.delete_problem(int(form_problem_key))
         return redirect(url_for("my_problems_page"))
-    
+
+
 def problem_delete(problem_key):
     db = current_app.config["db"]
     db.delete_problem(problem_key)
@@ -218,6 +222,7 @@ def problem_cancel(problem_key):
     db = current_app.config["db"]
     db.cancel_problem(problem_key)
     return redirect(url_for("my_problems_page"))
+
 
 def problem_finish(problem_key):
     db = current_app.config["db"]
@@ -253,6 +258,7 @@ def problem_add_page():
         return redirect(url_for("problem_page", problem_key=problem_key))
     return render_template("problem_add.html", form=form)
 
+
 def problem_select_page():
     db = current_app.config["db"]
     if request.method == "GET":
@@ -262,6 +268,7 @@ def problem_select_page():
             n_p = (build, problems[i][0], problems[i][1])
             problems[i] = n_p
         return render_template("select_problem.html", problems=sorted(problems))
+
 
 def problem_select(problem_key):
     db = current_app.config["db"]

@@ -15,7 +15,7 @@
 				<div class="field" >
 					<label for="title" class="label" >Title</label>
 					<div class="control" >
-						{{ form.title(required=True, autofocus=True, class="input") }}
+						{{ form.title(required=True, autofocus=True, class="input", placeholder="Title") }}
 					</div>
 					{% for error in form.title.errors %}
 						<p class="help has-background-warning">
@@ -27,7 +27,7 @@
 				<div class="field" >
 					<label for="description" class="label" >Description</label>
 					<div class="control" >
-						{{ form.description(required=True, autofocus=True, class="textarea") }}
+						{{ form.description(required=True, autofocus=True, class="textarea", placeholder="Description") }}
 					</div>
 					{% for error in form.description.errors %}
 						<p class="help has-background-warning">
@@ -37,9 +37,9 @@
 				</div>
 
 				<div class="field" >
-					<label for="build" class="label" >Build</label>
+					<label for="build" class="label" >Building</label>
 					<div class="control" >
-						{{ form.build(required=True, autofocus=True, class="select") }}
+						{{ form.build(required=True, autofocus=True, class="select", placeholder="Building") }}
 					</div>
 					{% for error in form.build.errors%}
 						<p class="help has-background-warning">
@@ -51,7 +51,7 @@
 				<div class="field" >
 					<label for="solution_r" class="label" >Solution Proposal (optional)</label>
 					<div class="control" >
-						{{ form.solution_r(required=True, autofocus=True, class="textarea") }}
+						{{ form.solution_r(required=True, autofocus=True, class="textarea", placeholder="Solution Proposal (optional)") }}
 					</div>
 					{% for error in form.solution_r.errors%}
 						<p class="help has-background-warning">
